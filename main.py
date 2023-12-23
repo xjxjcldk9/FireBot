@@ -11,11 +11,9 @@ os.chdir('D:\\Users\\cycfb206\\Desktop\\LineBot')
 
 
 website = 'http://cycfb.cyhg.gov.tw/DisasterPrevent.aspx?n=5F10482409025004&sms=ED4E0CDDC2EA92E6'
-token = 'vrB9tyzVyRyXVPQGahZzPJOUmzDf75a8k9wre42xTDn'
-fire_token = 'znybPQWIrKYZ6G6638Vp1aub56nEc7vuoKk2jDA1sYC'
-
-
-test = '4uHj0MLcvQeC7oqmWKJpy1mSurFEioMmjs4njUzZDmz'
+token = ...
+fire_token = ...
+test = ...
 
 
 
