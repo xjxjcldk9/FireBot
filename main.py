@@ -54,7 +54,8 @@ def is_second_big_team_case(case):
     return any(x in case['派遣分隊'] for x in second_big_teams)
 
 
-def has_status_changes(seen_row, case, status_col):
+def has_status_changes(seen_row, case):
+    status_col = ['案類-細項', '案發地點', '案件狀態']
     return (seen_row[status_col] != case[status_col]).any()
 
 
@@ -64,17 +65,16 @@ def decide_recipient_for_message(case, record):
                       "waterMain": False}
 
     seen_record = record[record['受理時間'] == case['受理時間']]
-    status_col = ['案類-細項', '案發地點', '案件狀態']
 
     if len(seen_record) != 0:
         seen_row = seen_record.iloc[0]
         if (is_water_main_case(case) and
-                has_status_changes(seen_row, case, status_col)):
+                has_status_changes(seen_row, case)):
             recipient_dict['waterMain'] = True
             if is_fire_case(case):
                 recipient_dict['volunteerFire'] = True
         elif (is_second_big_team_case(case) and
-              has_status_changes(seen_row, case, status_col)):
+              has_status_changes(seen_row, case)):
             if is_fire_case(case):
                 recipient_dict['secondBigTeam'] = True
     else:
