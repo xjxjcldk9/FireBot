@@ -3,121 +3,126 @@ import pandas as pd
 import os
 from datetime import datetime
 import sys
+import json
+
+# with open('path.txt') as f:
+#    PATH = f.readline()
+
+# os.chdir(PATH)
+
+with open('website.txt') as f:
+    website = f.readline()
+
+with open('tokens.json') as f:
+    tokens = json.load(f)
 
 
-os.chdir('D:\\Users\\cycfb206\\Desktop\\LineBot')
-
-
-
-
-website = 'http://cycfb.cyhg.gov.tw/DisasterPrevent.aspx?n=5F10482409025004&sms=ED4E0CDDC2EA92E6'
-token = ...
-fire_token = ...
-test = ...
-
-
-
-
-try:
-    df = pd.read_html(website)[0]
-except:
-    payload = {'message': '網頁忙碌中!'}
-    r = requests.post('https://notify-api.line.me/api/notify',
-                  headers={'Authorization': 'Bearer {}'.format(test)}, params=payload)
-    sys.exit(1)
-    
-
-cases = df[(df['派遣分隊'].str.contains('水上分隊'))]
-
-
-
-#讀取紀錄，若記錄檔不存在，則創造新的
-if not os.path.exists('record.csv'):
-    template = pd.DataFrame(columns=[*cases.columns, '創造時間'])
-    template.to_csv('record.csv', index=False)
-
-
-
-
-#測試有在跑
-
-t = datetime.now().strftime("%H:%M:%S")
-payload = {'message': f'機器人工作中。現在時間{t}',
-           'notificationDisabled': True}
-r = requests.post('https://notify-api.line.me/api/notify',
-                  headers={'Authorization': 'Bearer {}'.format(test)}, params=payload)
-
-
-
-
-def detectChange(row, recordRow):
-    detectedCols = [1,2,4]
-    for col in detectedCols:
-        if row.iloc[col] != recordRow.iloc[col]:
-            return True
-    return False
-
-
-def sendLine(row):
-    highlight = '⚠️'*5
-
-    is_fire = False
-
-    if '救護' in row['案類-細項']:
-        highlight = '🚑'*5
-    elif '火' in row['案類-細項']:
-        highlight = '🚒'*5
-        is_fire = True
-    
-    payload = {'message': '\n{}\n地點：{}\n類型：{}\n狀態：{}'.format(
-        highlight,
-        row['案發地點'].split()[1],
-        row['案類-細項'].split()[1],
-        row['案件狀態'].split()[1]
-    )}
-    
-    #一般
+def send_payload(payload, token):
     requests.post('https://notify-api.line.me/api/notify',
-                  headers={'Authorization': 'Bearer {}'.format(token)}, params=payload)
-    
-    #火警
-    if is_fire:
-        requests.post('https://notify-api.line.me/api/notify',
-                  headers={'Authorization': 'Bearer {}'.format(fire_token)}, params=payload)
+                  headers={'Authorization': f'Bearer {token}'},
+                  params=payload)
 
 
-
-dt_format = "%Y/%m/%d %H:%M:%S"
-
-
-def killRecord(record):
-    for index in record.index:
-        if (datetime.now() - datetime.strptime(record['創造時間'].loc[index],  dt_format)).days > 1:
-            record = record.drop(index)
-
-    record.to_csv('record.csv', index=False)
+def get_dataframe_from_website():
+    try:
+        df = pd.read_html(website)[0]
+    except:
+        payload = {'message': '網頁忙碌中!'}
+        send_payload(payload, tokens['testing'])
+        sys.exit(1)
+    return df
 
 
+def test_if_running():
+    # 測試有在跑
+    t = datetime.now().strftime("%H:%M:%S")
+    payload = {'message': f'機器人工作中。現在時間{t}',
+               'notificationDisabled': True}
+    send_payload(payload, tokens['testing'])
 
 
-#實際執行
+def is_water_main_case(case):
+    return '水上' in case['派遣分隊']
 
-record = pd.read_csv('record.csv')
 
-for index, row in cases.iterrows():
-    row['創造時間'] = datetime.now().strftime(dt_format)
-    tmpDf = pd.DataFrame(row).T
-    if (record['受理時間'].str.contains(row['受理時間']).any()):
-        recordRow = record[record['受理時間'] == row['受理時間']].iloc[0]
-        id = recordRow.name
-        if (detectChange(row, recordRow)):
-            record = record.drop(id)
-            record = pd.concat([record, tmpDf])
-            record.to_csv('record.csv', index = False)
-            sendLine(row)
-    elif('任務完成' not in row['案件狀態']):
-        record = pd.concat([record, tmpDf])
-        record.to_csv('record.csv', index=False)
-        sendLine(row)
-        
-killRecord(record)
+def is_fire_case(case):
+    return '火' in case['案類-細項']
+
+
+def is_second_big_team_case(case):
+    second_big_teams = ['水上', '民雄']
+    return any(x in case['派遣分隊'] for x in second_big_teams)
+
+
+def has_status_changes(seen_row, case, status_col):
+    return (seen_row[status_col] != case[status_col]).any()
+
+
+def decide_recipient_for_message(case, record):
+    recipient_dict = {"volunteerFire": False,
+                      "secondBigTeam": False,
+                      "waterMain": False}
+
+    seen_record = record[record['受理時間'] == case['受理時間']]
+    status_col = ['案類-細項', '案發地點', '案件狀態']
+
+    if len(seen_record) != 0:
+        seen_row = seen_record.iloc[0]
+        if (is_water_main_case(case) and
+                has_status_changes(seen_row, case, status_col)):
+            recipient_dict['waterMain'] = True
+            if is_fire_case(case):
+                recipient_dict['volunteerFire'] = True
+        elif (is_second_big_team_case(case) and
+              has_status_changes(seen_row, case, status_col)):
+            if is_fire_case(case):
+                recipient_dict['secondBigTeam'] = True
+    else:
+        if '任務完成' not in case['案件狀態']:
+            if is_water_main_case(case):
+                recipient_dict['waterMain'] = True
+                if is_fire_case(case):
+                    recipient_dict['volunteerFire'] = True
+            elif (is_second_big_team_case(case) and
+                  is_fire_case(case)):
+                recipient_dict['secondBigTeam'] = True
+
+    return recipient_dict
+
+
+def send_line_notification(case, record):
+    highlight = '🚑'*5
+
+    if '火' in case['案類-細項']:
+        highlight = '🚒'*5
+
+    case_splitted = case.str.split()
+    case_num = case_splitted.str[2]['受理時間'].replace(':', '')
+
+    payload = {'message': '{}\n編號：\n{}\n地點：{}\n類型：{}\n狀態：{}'.format(
+        case_num,
+        highlight,
+        case_splitted.str[1]['案發地點'],
+        case_splitted.str[1]['案類-細項'],
+        case_splitted.str[1]['案件狀態']
+    )}
+
+    recipient_dict = decide_recipient_for_message(case, record)
+
+    for place, send in recipient_dict.items():
+        if send:
+            send_payload(payload, tokens[place])
+
+
+# 實際執行
+
+def main():
+    test_if_running()
+    df = get_dataframe_from_website()
+    record = pd.read_csv('record.csv')
+    for case in df.iterrows():
+        send_line_notification(case, record)
+    df.to_csv('record.csv', index=False)
+
+
+main()
