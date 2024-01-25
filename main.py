@@ -45,6 +45,10 @@ def is_fire_case(case):
     return '火' in case['案類-細項']
 
 
+def not_grass_case(case):
+    return '雜草' not in case['案類-細項']
+
+
 def is_second_big_team_case(case):
     second_big_teams = ['水上', '民雄', '大林', '大美', '新港', '嘉太', '太保', '溪口', '雙福']
     return any(x in case['派遣分隊'] for x in second_big_teams)
@@ -71,7 +75,7 @@ def decide_recipient_for_message(case, record):
         if (is_second_big_team_case(case) and
                 has_status_changes(seen_row, case)):
 
-            if is_fire_case(case):
+            if (is_fire_case(case) and not_grass_case(case)):
                 recipient_dict['secondBigTeam'] = True
     else:
         if '任務完成' not in case['案件狀態']:
@@ -80,7 +84,8 @@ def decide_recipient_for_message(case, record):
                 if is_fire_case(case):
                     recipient_dict['volunteerFire'] = True
             if (is_second_big_team_case(case) and
-                    is_fire_case(case)):
+                    is_fire_case(case) and
+                    not_grass_case(case)):
                 recipient_dict['secondBigTeam'] = True
 
     return recipient_dict
