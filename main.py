@@ -5,10 +5,8 @@ from datetime import datetime
 import sys
 import json
 
-# with open('path.txt') as f:
-#    PATH = f.readline()
 
-# os.chdir(PATH)
+os.chdir('D:\\Users\\cycfb206\\Desktop\\LineBot')
 
 with open('website.txt') as f:
     website = f.readline()
@@ -50,12 +48,12 @@ def is_fire_case(case):
 
 
 def is_second_big_team_case(case):
-    second_big_teams = ['水上', '民雄']
+    second_big_teams = ['水上', '民雄', '大林', '大美', '新港', '嘉太', '太保', '溪口' ,'雙福']
     return any(x in case['派遣分隊'] for x in second_big_teams)
 
 
 def has_status_changes(seen_row, case):
-    status_col = ['案類-細項', '案發地點', '案件狀態']
+    status_col = ['案類-細項', '案發地點', '派遣分隊','案件狀態']
     return (seen_row[status_col] != case[status_col]).any()
 
 
@@ -68,13 +66,15 @@ def decide_recipient_for_message(case, record):
 
     if len(seen_record) != 0:
         seen_row = seen_record.iloc[0]
+        print(seen_row)
         if (is_water_main_case(case) and
                 has_status_changes(seen_row, case)):
             recipient_dict['waterMain'] = True
             if is_fire_case(case):
                 recipient_dict['volunteerFire'] = True
-        elif (is_second_big_team_case(case) and
+        if (is_second_big_team_case(case) and
               has_status_changes(seen_row, case)):
+            
             if is_fire_case(case):
                 recipient_dict['secondBigTeam'] = True
     else:
@@ -83,7 +83,7 @@ def decide_recipient_for_message(case, record):
                 recipient_dict['waterMain'] = True
                 if is_fire_case(case):
                     recipient_dict['volunteerFire'] = True
-            elif (is_second_big_team_case(case) and
+            if (is_second_big_team_case(case) and
                   is_fire_case(case)):
                 recipient_dict['secondBigTeam'] = True
 
@@ -99,16 +99,17 @@ def send_line_notification(case, record):
     case_splitted = case.str.split()
     case_num = case_splitted.str[2]['受理時間'].replace(':', '')
 
-    payload = {'message': '{}\n編號：\n{}\n地點：{}\n類型：{}\n狀態：{}'.format(
-        case_num,
+    payload = {'message': '\n{}\n編號：{}\n地點：{}\n類型：{}\n派遣：{}\n狀態：{}'.format(
         highlight,
+        case_num,
         case_splitted.str[1]['案發地點'],
         case_splitted.str[1]['案類-細項'],
+        case_splitted.str[1]['派遣分隊'],
         case_splitted.str[1]['案件狀態']
     )}
 
     recipient_dict = decide_recipient_for_message(case, record)
-
+    print(recipient_dict)
     for place, send in recipient_dict.items():
         if send:
             send_payload(payload, tokens[place])
@@ -119,10 +120,14 @@ def send_line_notification(case, record):
 def main():
     test_if_running()
     df = get_dataframe_from_website()
-    record = pd.read_csv('record.csv')
-    for case in df.iterrows():
-        send_line_notification(case, record)
+    try:
+        record = pd.read_csv('record.csv')
+        for case in df.iterrows():
+            send_line_notification(case, record)
+    except:
+        pass
     df.to_csv('record.csv', index=False)
 
 
 main()
+
