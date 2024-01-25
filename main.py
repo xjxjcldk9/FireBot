@@ -50,7 +50,7 @@ def is_fire_case(case):
 
 
 def is_second_big_team_case(case):
-    second_big_teams = ['水上', '民雄']
+    second_big_teams = ['水上', '民雄', '大林']
     return any(x in case['派遣分隊'] for x in second_big_teams)
 
 
@@ -65,7 +65,6 @@ def decide_recipient_for_message(case, record):
                       "waterMain": False}
 
     seen_record = record[record['受理時間'] == case['受理時間']]
-
     if len(seen_record) != 0:
         seen_row = seen_record.iloc[0]
         if (is_water_main_case(case) and
@@ -118,11 +117,12 @@ def send_line_notification(case, record):
 
 def main():
     test_if_running()
+
     df = get_dataframe_from_website()
-    record = pd.read_csv('record.csv')
-    for case in df.iterrows():
-        send_line_notification(case, record)
+    try:
+        record = pd.read_csv('record.csv')
+        for case in df.iterrows():
+            send_line_notification(case, record)
+    except:
+        pass
     df.to_csv('record.csv', index=False)
-
-
-main()
