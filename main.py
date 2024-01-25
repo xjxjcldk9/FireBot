@@ -6,8 +6,6 @@ import sys
 import json
 
 
-os.chdir('D:\\Users\\cycfb206\\Desktop\\LineBot')
-
 with open('website.txt') as f:
     website = f.readline()
 
@@ -65,7 +63,6 @@ def decide_recipient_for_message(case, record):
     seen_record = record[record['受理時間'] == case['受理時間']]
     if len(seen_record) != 0:
         seen_row = seen_record.iloc[0]
-        print(seen_row)
         if (is_water_main_case(case) and
                 has_status_changes(seen_row, case)):
             recipient_dict['waterMain'] = True
@@ -108,7 +105,7 @@ def send_line_notification(case, record):
     )}
 
     recipient_dict = decide_recipient_for_message(case, record)
-    print(recipient_dict)
+
     for place, send in recipient_dict.items():
         if send:
             send_payload(payload, tokens[place])
@@ -118,14 +115,10 @@ def send_line_notification(case, record):
 
 def main():
     test_if_running()
-
     df = get_dataframe_from_website()
-    try:
-        record = pd.read_csv('record.csv')
-        for case in df.iterrows():
-            send_line_notification(case, record)
-    except:
-        pass
+    record = pd.read_csv('record.csv')
+    for _, case in df.iterrows():
+        send_line_notification(case, record)
     df.to_csv('record.csv', index=False)
 
 
