@@ -56,7 +56,9 @@ def is_second_big_team_case(case):
 
 def has_status_changes(seen_row, case):
     status_col = ['案類-細項', '案發地點', '派遣分隊', '案件狀態']
-    return (seen_row[status_col] != case[status_col]).any()
+    any_change = (seen_row[status_col] != case[status_col]).any()
+    case_not_na = len(case['案件狀態'].split()) > 1
+    return any_change and case_not_na
 
 
 def decide_recipient_for_message(case, record):
