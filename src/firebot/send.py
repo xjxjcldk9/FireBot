@@ -1,16 +1,11 @@
-import requests
-import pandas as pd
 import os
 from datetime import datetime
-import sys
-import json
 
+import pandas as pd
+import requests
+from dotenv import load_dotenv
 
-with open('website.txt') as f:
-    website = f.readline()
-
-with open('tokens.json') as f:
-    tokens = json.load(f)
+load_dotenv()
 
 
 def send_payload(payload, token):
@@ -19,22 +14,12 @@ def send_payload(payload, token):
                   params=payload)
 
 
-def get_dataframe_from_website():
+def get_df_from_website():
     try:
-        df = pd.read_html(website)[0]
+        df = pd.read_html(os.getenv("WEBSITE"))[0]
     except:
-        payload = {'message': '網頁忙碌中!'}
-        send_payload(payload, tokens['testing'])
-        sys.exit(1)
+        df = None
     return df
-
-
-def test_if_running():
-    # 測試有在跑
-    t = datetime.now().strftime("%H:%M:%S")
-    payload = {'message': f'機器人工作中。現在時間{t}',
-               'notificationDisabled': True}
-    send_payload(payload, tokens['testing'])
 
 
 def is_water_main_case(case):
@@ -127,6 +112,3 @@ def main():
     for _, case in df.iterrows():
         send_line_notification(case, record)
     df.to_csv('record.csv', index=False)
-
-
-main()
