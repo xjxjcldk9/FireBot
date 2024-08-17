@@ -9,5 +9,9 @@ dependencies=[
     "lxml",
     "pandas",
     "requests",
-    "dotenv"
+    "python-dotenv"
 ]
+
+
+[project.scripts]
+fire = "firebot:main"
