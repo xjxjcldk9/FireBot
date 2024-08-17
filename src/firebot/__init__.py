@@ -1,12 +1,16 @@
 from pathlib import Path
 
 import pandas as pd
+import datetime
 
 from firebot.utils import (create_empty_record, get_df_from_website,
                            send_line_notification)
 
 
+
 def main():
+    print(f'firebot is running {datetime.datetime.now()}')
+
     p = Path('.')/'record'
     p.mkdir(exist_ok=True)
     p = p / 'record.csv'
