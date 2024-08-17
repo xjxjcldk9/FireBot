@@ -1,5 +1,4 @@
 import os
-from datetime import datetime
 
 import pandas as pd
 import requests
@@ -78,37 +77,34 @@ def decide_recipient_for_message(case, record):
     return recipient_dict
 
 
-def send_line_notification(case, record):
+def send_line_notification(case, record, test=False):
     highlight = '🚑'*5
 
     if '火' in case['案類-細項']:
         highlight = '🚒'*5
 
-    case_splitted = case.str.split()
-    case_num = case_splitted.str[2]['受理時間'].replace(':', '')
+    case_num = case['受理時間'].split()[1].replace(':', '')
 
-    payload = {'message': '\n{}\n編號：{}\n地點：{}\n類型：{}\n派遣：{}\n狀態：{}'.format(
-        highlight,
-        case_num,
-        case_splitted.str[1]['案發地點'],
-        case_splitted.str[1]['案類-細項'],
-        case_splitted.str[1]['派遣分隊'],
-        case_splitted.str[1]['案件狀態']
-    )}
+    payload = {'message':
+               f'''
+               \n{highlight}
+               \n編號：{case_num}
+               \n地點：{case['案發地點']}
+               \n類型：{case['案類-細項']}
+               \n派遣：{case['派遣分隊']}
+               \n狀態：{case['案件狀態']}
+               '''}
 
     recipient_dict = decide_recipient_for_message(case, record)
 
-    for place, send in recipient_dict.items():
-        if send:
-            send_payload(payload, tokens[place])
+    if test:
+        print(payload)
+    else:
+        for place, send in recipient_dict.items():
+            if send:
+                send_payload(payload, os.getenv[place])
 
 
-# 實際執行
-
-def main():
-    test_if_running()
-    df = get_dataframe_from_website()
-    record = pd.read_csv('record.csv')
-    for _, case in df.iterrows():
-        send_line_notification(case, record)
-    df.to_csv('record.csv', index=False)
+def create_empty_record(path):
+    df = pd.DataFrame(columns=["受理時間", "案類-細項", "案發地點", "派遣分隊", "案件狀態"])
+    df.to_csv(path)

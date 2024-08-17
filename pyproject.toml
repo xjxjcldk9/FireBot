@@ -5,3 +5,9 @@ build-backend = "hatchling.build"
 [project]
 name = "firebot"
 version = "2.0"
+dependencies=[
+    "lxml",
+    "pandas",
+    "requests",
+    "dotenv"
+]
