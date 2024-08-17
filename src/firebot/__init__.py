@@ -1,5 +1,5 @@
-import datetime
 
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pandas as pd
@@ -7,9 +7,12 @@ import pandas as pd
 from firebot.utils import (create_empty_record, get_df_from_website,
                            send_line_notification)
 
+timezone_offset = 8.0  # Pacific Standard Time (UTC−08:00)
+tzinfo = timezone(timedelta(hours=timezone_offset))
+
 
 def fire_bot_worker(user):
-    print(f'firebot is running {datetime.datetime.now()}')
+    print(f'firebot is running {datetime.now(tzinfo)}')
 
     p = Path('.')/'record'
     p.mkdir(exist_ok=True)

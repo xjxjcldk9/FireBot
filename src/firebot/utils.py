@@ -8,9 +8,7 @@ load_dotenv()
 
 
 def send_payload(payload, token):
-    data = {
-        'message': payload
-    }
+    data = {'message': payload}
     response = requests.post('https://notify-api.line.me/api/notify',
                              headers={'Authorization': f'Bearer {token}'},
                              data=data)
@@ -23,23 +21,6 @@ def get_df_from_website():
     except:
         df = None
     return df
-
-
-def is_water_main_case(case):
-    return '水上' in case['派遣分隊']
-
-
-def is_fire_case(case):
-    return '火' in case['案類-細項']
-
-
-def not_grass_case(case):
-    return '雜草' not in case['案類-細項']
-
-
-def is_second_big_team_case(case):
-    second_big_teams = ['水上', '民雄', '大林', '大美', '新港', '嘉太', '太保', '溪口', '雙福']
-    return any(x in case['派遣分隊'] for x in second_big_teams)
 
 
 def send_line_notification(case, record, user):
@@ -67,7 +48,6 @@ def send_line_notification(case, record, user):
         unseen = True
 
     if (user.check(case)) and (seen_changed or unseen):
-
         send_payload(payload, user.token)
 
 
