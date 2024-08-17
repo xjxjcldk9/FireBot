@@ -1,8 +1,9 @@
 from pathlib import Path
 
-from firebot.utils import get_df_from_website, create_empty_record, send_line_notification
-from firebot import main
 import pandas as pd
+
+from firebot.utils import (create_empty_record, get_df_from_website,
+                           send_line_notification)
 
 p = Path('.')/'record'
 p.mkdir(exist_ok=True)

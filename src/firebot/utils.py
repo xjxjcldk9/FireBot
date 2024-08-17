@@ -77,7 +77,7 @@ def decide_recipient_for_message(case, record):
     return recipient_dict
 
 
-def send_line_notification(case, record, test=False):
+def send_line_notification(case, record, test=False, to_who=...):
     highlight = '🚑'*5
 
     if '火' in case['案類-細項']:
@@ -95,14 +95,20 @@ def send_line_notification(case, record, test=False):
                \n狀態：{case['案件狀態']}
                '''}
 
-    recipient_dict = decide_recipient_for_message(case, record)
+    send = False
+    if to_who.check(case):
 
-    if test:
-        print(payload)
-    else:
-        for place, send in recipient_dict.items():
-            if send:
-                send_payload(payload, os.getenv[place])
+        # check if this case has sent
+        if case['受理時間'] in record['受理時間']:
+            # 檢查是否發生改變
+            seen_case = record[record['受理時間'] == case['受理時間']].iloc[0]
+            if not (seen_case == case).all():
+                send = True
+        elif '任務完成' not in case['案件狀態']:
+            send = True
+
+    if send:
+        send_payload(payload, to_who.token)
 
 
 def create_empty_record(path):

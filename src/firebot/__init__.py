@@ -7,7 +7,6 @@ from firebot.utils import (create_empty_record, get_df_from_website,
                            send_line_notification)
 
 
-
 def main():
     print(f'firebot is running {datetime.datetime.now()}')
 
@@ -29,5 +28,4 @@ def main():
         print('webpage busy')
 
 
-if __name__ == '__main__':
-    main()
+waterMain = USERS()
