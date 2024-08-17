@@ -1,8 +1,9 @@
 
 class USERS:
-    def __init__(self, token, checker):
+    def __init__(self, name, token, checker):
+        self.name = name
         self.token = token
         self.checker = checker
 
     def check(self, case):
-        self.checker(case)
+        return self.checker(case)
