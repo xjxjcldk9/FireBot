@@ -29,9 +29,12 @@ def send_line_notification(case, record, user):
     if '火' in case['案類-細項']:
         highlight = '🚒'*5
 
-    case_num = case['受理時間'].split()[1].replace(':', '')
-
-    payload = f"\n{highlight}\n編號：{case_num}\n地點：{case['案發地點']}\n類型：{case['案類-細項']}\n派遣：{case['派遣分隊']}\n狀態：{case['案件狀態']}"
+    payload = f"\n{highlight}\
+    \n時間：{case['受理時間']}\
+    \n地點：{case['案發地點']}\
+    \n類型：{case['案類-細項']}\
+    \n派遣：{case['派遣分隊']}\
+    \n狀態：{case['案件狀態']}"
 
     seen_changed = False
     unseen = False

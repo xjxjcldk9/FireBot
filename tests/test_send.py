@@ -2,10 +2,20 @@ import os
 from pathlib import Path
 
 import pandas as pd
+from dotenv import load_dotenv
 
-
+from firebot import fire_bot_worker
+from firebot.users import USERS
 from firebot.utils import (create_empty_record, get_df_from_website,
                            send_line_notification, send_payload)
+
+load_dotenv()
+
+
+user = USERS('tester',
+             os.getenv('TESTER'),
+             lambda x: True)
+
 
 p = Path('.')/'record'
 p.mkdir(exist_ok=True)
@@ -29,7 +39,7 @@ def test_send_payload():
 
 
 def test_send_line_notification():
-    record = pd.read_csv(p/'t_record.csv')
+    record = pd.read_csv(p/'empty.csv')
     df = get_df_from_website()
     for _, case in df.iterrows():
         send_line_notification(case, record, user)
