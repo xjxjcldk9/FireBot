@@ -12,8 +12,6 @@ tzinfo = timezone(timedelta(hours=timezone_offset))
 
 
 def fire_bot_worker(user):
-    print(f'firebot is running {datetime.now(tzinfo)}')
-
     p = Path('.')/'record'
     p.mkdir(exist_ok=True)
     p = p / f'{user.name}_record.csv'
@@ -29,4 +27,4 @@ def fire_bot_worker(user):
             send_line_notification(case, record, user)
         df.to_csv(p, index=False)
     else:
-        print('webpage busy')
+        print(f'webpage busy {datetime.now(tzinfo)}')
