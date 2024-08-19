@@ -27,6 +27,8 @@ def test_fetch_df():
         df.to_csv(p/'t_record.csv', index=False)
         assert set(df.columns) == set(
             ['受理時間', '案類-細項', '案發地點', '派遣分隊', '案件狀態'])
+        for _, case in df.iterrows():
+            assert isinstance(case['派遣分隊'], str)
 
 
 def test_empty_record():

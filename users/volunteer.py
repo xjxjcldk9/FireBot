@@ -9,15 +9,15 @@ load_dotenv()
 
 
 def is_water(case):
-    return '水上' in case['派遣分隊']
+    return '水上' in str(case['派遣分隊'])
 
 
 def is_fire_case(case):
-    return '火' in case['案類-細項']
+    return '火' in str(case['案類-細項'])
 
 
 def not_grass_case(case):
-    return '雜草' not in case['案類-細項']
+    return '雜草' not in str(case['案類-細項'])
 
 
 def checker(case):

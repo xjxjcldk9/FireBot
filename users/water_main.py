@@ -9,7 +9,7 @@ load_dotenv()
 
 
 def checker(case):
-    return '水上' in case['派遣分隊']
+    return '水上' in str(case['派遣分隊'])
 
 
 user = USERS('water_main',
