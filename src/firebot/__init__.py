@@ -7,7 +7,7 @@ import pandas as pd
 from firebot.utils import (create_empty_record, get_df_from_website,
                            send_line_notification)
 
-timezone_offset = 8.0  # Pacific Standard Time (UTC−08:00)
+timezone_offset = 8.0  
 tzinfo = timezone(timedelta(hours=timezone_offset))
 
 

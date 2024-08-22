@@ -45,7 +45,8 @@ def send_line_notification(case, record, user):
     if len(seen_case) > 0:
         # 檢查是否發生改變
         if not (seen_case.iloc[0] == case).all():
-            seen_changed = True
+            if not seen_case.iloc[0].isna().any():
+                seen_changed = True
     else:
         unseen = True
 

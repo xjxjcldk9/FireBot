@@ -41,7 +41,7 @@ def test_send_payload():
 
 
 def test_send_line_notification():
-    record = pd.read_csv(p/'empty.csv')
+    record = pd.read_csv(p/'t_record.csv')
     df = get_df_from_website()
     for _, case in df.iterrows():
         send_line_notification(case, record, user)
