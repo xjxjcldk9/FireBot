@@ -40,13 +40,17 @@ def send_line_notification(case, record, user):
     unseen = False
 
     # check if this case has sent
-    seen_case = record[record['受理時間'] == case['受理時間']]
+    seen_cases = record[record['受理時間'] == case['受理時間']]
 
-    if len(seen_case) > 0:
+    if len(seen_cases) > 0:
         # 檢查是否發生改變
-        if not (seen_case.iloc[0] == case).all():
-            if not seen_case.iloc[0].isna().any():
-                seen_changed = True
+        seen_case = seen_cases.iloc[0]
+
+        # 都先fillna，因為nan會不相等
+        seen_case = seen_case.fillna(1)
+        case = case.fillna(1)
+        if not (seen_case == case).all():
+            seen_changed = True
     else:
         unseen = True
 
