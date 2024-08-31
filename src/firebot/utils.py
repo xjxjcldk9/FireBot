@@ -1,10 +1,7 @@
-import os
+
 
 import pandas as pd
 import requests
-from dotenv import load_dotenv
-
-load_dotenv()
 
 
 def send_payload(payload, token):
@@ -16,8 +13,9 @@ def send_payload(payload, token):
 
 
 def get_df_from_website():
+    cycfb = "http://cycfb.cyhg.gov.tw/DisasterPrevent.aspx?n=5F10482409025004&sms=ED4E0CDDC2EA92E6"
     try:
-        df = pd.read_html(os.getenv("WEBSITE"))[0]
+        df = pd.read_html(cycfb)[0]
     except:
         df = None
     return df
