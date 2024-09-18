@@ -26,12 +26,3 @@ pip install .
 - 沒看過的案件
 - 看過但是狀態改變
 
-# 如何部署
-
-進入虛擬環境並且資料夾位於```users/```當中
-
-```shell
-while true; do 檔名.py; sleep 60; done
-```
-
-系統就會每60秒偵測一次，並把錯誤都output出來
