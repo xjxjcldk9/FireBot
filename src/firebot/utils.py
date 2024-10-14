@@ -1,7 +1,6 @@
-
-
 import pandas as pd
 import requests
+from discordwebhook import Discord
 
 
 def send_payload(payload, token):
@@ -10,6 +9,11 @@ def send_payload(payload, token):
                              headers={'Authorization': f'Bearer {token}'},
                              data=data)
     return response
+
+
+def send_payload_discord(payload, web_hook_url):
+    discord = Discord(url=web_hook_url)
+    discord.post(content=payload)
 
 
 def get_df_from_website():
@@ -22,10 +26,10 @@ def get_df_from_website():
 
 
 def send_line_notification(case, record, user):
-    highlight = '🚑'*5
+    highlight = '🚑' * 5
 
     if '火' in case['案類-細項']:
-        highlight = '🚒'*5
+        highlight = '🚒' * 5
 
     payload = f"\n{highlight}\
     \n時間：{case['受理時間']}\
@@ -54,6 +58,7 @@ def send_line_notification(case, record, user):
 
     if (user.check(case)) and (seen_changed or unseen):
         send_payload(payload, user.token)
+        send_payload_discord(payload, user.web_hook_url)
 
 
 def create_empty_record(path):
