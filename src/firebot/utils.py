@@ -32,11 +32,14 @@ def send_discord_notification(case, record, user):
     if '火' in case['案類-細項']:
         highlight = '🚒'
 
-    payload = f"\n{highlight} 受理時間：{case['受理時間']}\
-    \n{highlight} 地點：{case['案發地點']}\
-    \n{highlight} 類型：{case['案類-細項']}\
-    \n{highlight} 派遣：{case['派遣分隊']}\
-    \n{highlight} 狀態：{case['案件狀態']}"
+    
+    msg = [highlight*5,
+           f"受理時間：{case['受理時間']}",
+           f"地點：{case['案發地點']}", 
+           f"類型：{case['案類-細項']}", 
+           f"派遣：{case['派遣分隊']}", 
+           f"狀態：{case['案件狀態']}"]
+    payload = '\n'.join(msg)
 
     seen_changed = False
     unseen = False
@@ -66,7 +69,7 @@ def send_line_notification(case, record, user):
         highlight = '🚒' * 5
 
     payload = f"\n{highlight}\
-    \n時間：{case['受理時間']}\
+    \n受理時間：{case['受理時間']}\
     \n地點：{case['案發地點']}\
     \n類型：{case['案類-細項']}\
     \n派遣：{case['派遣分隊']}\
