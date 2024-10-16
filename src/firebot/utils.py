@@ -1,6 +1,7 @@
 import pandas as pd
 import requests
 from discordwebhook import Discord
+import datetime
 
 
 def send_payload(payload, token):
@@ -32,8 +33,10 @@ def send_notification(case, record, user):
     if '火' in case['案類-細項']:
         highlight = '🚒'
 
+    now = datetime.datetime.now()
     msg = [highlight*5,
            f"受理時間：{case['受理時間']}",
+           f"發送時間：{now.strftime('%H:%M:%S')}",
            f"地點：{case['案發地點']}", 
            f"類型：{case['案類-細項']}", 
            f"派遣：{case['派遣分隊']}", 
