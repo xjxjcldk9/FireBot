@@ -27,6 +27,7 @@ def checker(case):
 
 user = USERS('second_big',
              os.getenv('SECONDBIG'),
+             os.getenv('SECONDBIG_WEB_HOOK'),
              checker)
 
 fire_bot_worker(user)

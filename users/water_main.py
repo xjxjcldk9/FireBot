@@ -14,6 +14,7 @@ def checker(case):
 
 user = USERS('water_main',
              os.getenv('WATERMAIN'),
+             os.getenv('WATERMAIN_WEB_HOOK'),
              checker)
 
 fire_bot_worker(user)

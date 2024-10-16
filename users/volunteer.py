@@ -16,16 +16,14 @@ def is_fire_case(case):
     return '火' in str(case['案類-細項'])
 
 
-def not_grass_case(case):
-    return '雜草' not in str(case['案類-細項'])
-
 
 def checker(case):
-    return is_water(case) and not_grass_case(case) and is_fire_case(case)
+    return is_water(case) and is_fire_case(case)
 
 
 user = USERS('volunteer',
              os.getenv('VOLUNTEER'),
+             os.getenv('VOLUNTEER_WEB_HOOK'),
              checker)
 
 fire_bot_worker(user)
