@@ -5,7 +5,7 @@ from pathlib import Path
 import pandas as pd
 
 from firebot.utils import (create_empty_record, get_df_from_website,
-                           send_line_notification, send_discord_notification)
+                           send_notification)
 
 timezone_offset = 8.0  
 tzinfo = timezone(timedelta(hours=timezone_offset))
@@ -26,8 +26,7 @@ def fire_bot_worker(user):
         #先存，有時候discord會卡住＝＝
         df.to_csv(p, index=False)
         for _, case in df.iterrows():
-            send_line_notification(case, record, user)
-            send_discord_notification(case, record, user)
+            send_notification(case, record, user)
         
     else:
         print(f'webpage busy {datetime.now(tzinfo)}')

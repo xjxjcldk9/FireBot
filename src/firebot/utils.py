@@ -26,13 +26,12 @@ def get_df_from_website():
 
 
 
-def send_discord_notification(case, record, user):
+def send_notification(case, record, user):
     highlight = '🚑'
 
     if '火' in case['案類-細項']:
         highlight = '🚒'
 
-    
     msg = [highlight*5,
            f"受理時間：{case['受理時間']}",
            f"地點：{case['案發地點']}", 
@@ -60,42 +59,10 @@ def send_discord_notification(case, record, user):
         unseen = True
 
     if (user.check(case)) and (seen_changed or unseen):
+        send_payload(payload, user.token)
         send_payload_discord(payload, user.web_hook_url)
 
-def send_line_notification(case, record, user):
-    highlight = '🚑' * 5
 
-    if '火' in case['案類-細項']:
-        highlight = '🚒' * 5
-
-    payload = f"\n{highlight}\
-    \n受理時間：{case['受理時間']}\
-    \n地點：{case['案發地點']}\
-    \n類型：{case['案類-細項']}\
-    \n派遣：{case['派遣分隊']}\
-    \n狀態：{case['案件狀態']}"
-
-    seen_changed = False
-    unseen = False
-
-    # check if this case has sent
-    seen_cases = record[record['受理時間'] == case['受理時間']]
-
-    if len(seen_cases) > 0:
-        # 檢查是否發生改變
-        seen_case = seen_cases.iloc[0]
-
-        # 都先fillna，因為nan會不相等
-        seen_case = seen_case.fillna(1)
-        case = case.fillna(1)
-        if not (seen_case == case).all():
-            seen_changed = True
-    else:
-        unseen = True
-
-    if (user.check(case)) and (seen_changed or unseen):
-        send_payload(payload, user.token)
-        
 
 
 def create_empty_record(path):
