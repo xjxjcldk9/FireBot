@@ -1,6 +1,7 @@
 import pandas as pd
 import requests
 from discordwebhook import Discord
+from io import BytesIO
 
 
 def send_payload(payload, token):
@@ -17,11 +18,9 @@ def send_payload_discord(payload, web_hook_url):
 
 
 def get_df_from_website():
-    cycfb = "http://cycfb.cyhg.gov.tw/DisasterPrevent.aspx?n=5F10482409025004&sms=ED4E0CDDC2EA92E6"
-    try:
-        df = pd.read_html(cycfb)[0]
-    except:
-        df = None
+    cycfb = "https://cycfb.cyhg.gov.tw/DisasterPrevent.aspx?n=5F10482409025004&sms=ED4E0CDDC2EA92E6"
+    response = requests.get(cycfb)
+    df = pd.read_html(BytesIO(response.content))[0]
     return df
 
 
