@@ -7,7 +7,9 @@ from firebot.users import USERS
 
 load_dotenv()
 
-user = USERS('tester', os.getenv('TESTER'), os.getenv('TESTER_WEB_HOOK'),
-             lambda x: True)
+user = USERS(name='tester',
+             token=os.getenv('TESTER'),
+             web_hook_url=os.getenv('TESTER_WEB_HOOK'),
+             checker=lambda x: True)
 
 fire_bot_worker(user)
